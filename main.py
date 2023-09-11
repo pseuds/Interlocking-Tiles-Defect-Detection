@@ -1,23 +1,16 @@
 import os
+import cv2
 from os import listdir
-from cv_functions import edge_detector_save, resize_save
+from cv_functions import get_image_dimensions, get_d32, resize_save
 
-folder_dir = "images/asphalt-tiles"
-output_dir = "output/asphalt_tiles_resize_1"
+# for every image in input folder, resize and divide into 4 and save in output folder.
+# folder_dir = "datasets_sorted/asphalt-tiles"
+# output_dir = "output/asphalt_tiles_resize_1"
 
-for image in os.listdir(folder_dir):
-    resize_save(folder_dir + f"/{image}", output_dir, 1632, 1216)
-    print(image)
+# for image in os.listdir(folder_dir):
+#     resize_save(folder_dir + f"/{image}", output_dir, 1632, 1216)
+#     print(image)
 
-# input_img = "images/asphalt_tiles/IMG_9083.JPG"
-# output_folder = "output/asphalt_tiles"
-# t1 = 350
-# t2 = 475
-
-# edge_detector_save(input_img, output_folder, t1, t2)
-
-# input_img = "images/asphalt_tiles/IMG_9084.JPG"
-# output_folder = "output/asphalt_tiles"
-
-# edge_detector_save(input_img, output_folder, t1, t2)
-
+# img_path = "datasets_sorted/asphalt-tiles/IMG_9083.JPG"
+# h, w = get_image_dimensions(image_path=img_path)
+# get_d32(h, w, new_width=1600)
