@@ -1,8 +1,48 @@
 import cv2
 import os
+import sys
 from os import listdir
 import numpy as np
+import random
 import matplotlib.pyplot as plt
+from PIL import Image
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
+from copy import deepcopy
+
+def incr_contrast(image_path, output_folder=None, clip_limit=2, save=True):
+    if save:
+        img = cv2.imread(image_path)
+        new_name = image_path.split('/')[-1].split('.')[0]
+    else:
+        img = image_path
+
+    # converting to LAB color space
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    l_channel, a, b = cv2.split(lab)
+
+    # Applying CLAHE to L-channel
+    # feel free to try different values for the limit and grid size:
+    clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(8,8))
+    cl = clahe.apply(l_channel)
+
+    # merge the CLAHE enhanced L-channel with the a and b channel
+    limg = cv2.merge((cl,a,b))
+
+    # Converting image from LAB Color model to BGR color spcae
+    enhanced_img = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+
+    if not save:
+        return enhanced_img
+    else:
+        if output_folder == None:
+            cv2.imwrite(f'output/{new_name}.jpg', enhanced_img)
+        else:
+            if output_folder[-1] != '/':
+                cv2.imwrite(output_folder + f'/{new_name}.jpg', enhanced_img)
+            else:
+                cv2.imwrite(output_folder + f'{new_name}.jpg', enhanced_img)
+
 
 ########################################## EDGE DETECTORS ##########################################
 
@@ -66,9 +106,9 @@ def resize_save(image_path, output_folder, new_width, new_height):
     new_image = cv2.resize(image, (new_width, new_height))
     name = image_path.split('/')[-1].split('.')[0]
     if output_folder[-1] != '/':
-        cv2.imwrite(output_folder + f'/{name}_{new_width}x{new_height}.jpg', new_image)
+        cv2.imwrite(output_folder + f'/{name}.jpg', new_image)
     else:
-        cv2.imwrite(output_folder + f'{name}_{new_width}x{new_height}.jpg', new_image)
+        cv2.imwrite(output_folder + f'{name}.jpg', new_image)
 
 def resize_byFactor_save(image_path, output_folder=None, fx=0.5, fy=0.5):
     image = cv2.imread(image_path)
@@ -109,3 +149,34 @@ def split_image_in_4(image_path, output_folder):
         cv2.imwrite(output_folder + f'{new_name}_2.jpg', crop_2)
         cv2.imwrite(output_folder + f'{new_name}_3.jpg', crop_3)
         cv2.imwrite(output_folder + f'{new_name}_4.jpg', crop_4)
+
+
+########################################## VIDEOS ##########################################
+
+def preprocess_frames(video_path, output_folder, frame_count=-1):
+    vidObj = cv2.VideoCapture(video_path)
+    count = 0
+    success = 1
+    while success:
+        success, image = vidObj.read()
+
+        try:
+            # print(f"count:{count} , success:{success}")
+
+            # preprocess
+            enhanced_img = incr_contrast(image_path=image, clip_limit=5, save=False)
+            sized_img = cv2.resize(enhanced_img, (800, 800))
+
+            # save in output folder
+            cv2.imwrite(f"{output_folder}/frame{count_to_string(count)}.jpg", sized_img)
+            count += 1
+        except:
+            success = 1
+            count += 1
+
+        if frame_count != -1 and count >= frame_count:
+            break
+
+def count_to_string(count):
+    l = 8
+    return "0"*(l-len(str(count))) + str(count)

@@ -1,11 +1,14 @@
 # My Jazz
 datasets/
+datasets_processed/
 datasets_project/
 datasets_sorted/
 defect_detection_attempt_1/
 output/
 JSON2YOLO/
+runs/
 yolov5/
+yolov7-u7/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
